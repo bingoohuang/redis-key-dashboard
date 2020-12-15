@@ -11,8 +11,6 @@ import (
 func Scanner() {
 	for {
 		if ScanStatus == StatusWorker {
-			time.Sleep(time.Duration(1) * time.Second)
-
 			ScanStatus = StatusProcess
 			RedisInfo.StartTime = time.Now()
 
@@ -21,6 +19,7 @@ func Scanner() {
 			RedisInfo.EndTime = time.Now()
 			ScanStatus = StatusReady
 		}
+
 		time.Sleep(time.Duration(1) * time.Second)
 	}
 }

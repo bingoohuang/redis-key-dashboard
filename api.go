@@ -10,7 +10,6 @@ import (
 	"math"
 	"mime"
 	"net/http"
-	"net/url"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -65,49 +64,6 @@ func (cp ContextPath) Path(p string) string {
 	return path.Join(cp.ContextPath, p)
 }
 
-func (cp ContextPath) Wrap(f func(*gin.Context, ContextPath)) gin.HandlerFunc {
-	fn := func(c *gin.Context) {
-		if cp.AuthFn != nil {
-			cp.AuthFn(c)
-		}
-
-		if !c.IsAborted() {
-			f(c, cp)
-		}
-	}
-
-	if cp.ContextPath == "" {
-		return fn
-	}
-
-	return StripPrefix(cp.ContextPath, fn)
-}
-
-// StripPrefix returns a handler that serves HTTP requests
-// by removing the given prefix from the request URL's Path
-// and invoking the handler h. StripPrefix handles a
-// request for a path that doesn't begin with prefix by
-// replying with an HTTP 404 not found error.
-func StripPrefix(prefix string, h gin.HandlerFunc) gin.HandlerFunc {
-	if prefix == "" {
-		return h
-	}
-
-	return func(c *gin.Context) {
-		if p := strings.TrimPrefix(c.Request.URL.Path, prefix); len(p) < len(c.Request.URL.Path) {
-			r2 := new(http.Request)
-			*r2 = *c.Request
-			r2.URL = new(url.URL)
-			*r2.URL = *c.Request.URL
-			r2.URL.Path = p
-			c.Request = r2
-			h(c)
-		} else {
-			http.NotFound(c.Writer, c.Request)
-		}
-	}
-}
-
 func (cp ContextPath) AssetsHandler(c *gin.Context) {
 	name := c.Param("name")
 	raw, err := pkger.Read("/assets/" + name)
@@ -155,7 +111,7 @@ func (cp ContextPath) MainHandler(c *gin.Context) {
 	}
 }
 
-func (cp ContextPath) ResetWorkerHandler(c *gin.Context) {
+func (cp ContextPath) ResetWorkerHandler(*gin.Context) {
 	ScanStatus = StatusIdle
 	ScanErrMsg = ""
 	RedisInfo = RedisInfoStruct{}

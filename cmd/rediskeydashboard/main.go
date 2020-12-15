@@ -28,5 +28,7 @@ func main() {
 	rediskeydashboard.ScanStatus = rediskeydashboard.StatusIdle
 	go rediskeydashboard.Scanner()
 
-	r.Run(fmt.Sprintf(":%d", *serverPort))
+	if err := r.Run(fmt.Sprintf(":%d", *serverPort)); err != nil {
+		panic(err)
+	}
 }
