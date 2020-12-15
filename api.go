@@ -52,7 +52,7 @@ func fixContextPath(p string) string {
 		return ""
 	}
 
-	if strings.HasPrefix(p, "/") {
+	if !strings.HasPrefix(p, "/") {
 		p = "/" + p
 	}
 
@@ -68,7 +68,8 @@ func (cp ContextPath) OpenExplorer(port int) {
 	switch runtime.GOOS {
 	case "windows", "darwin":
 		n, _ := random.AlphaNum(10)
-		_ = open.Run(fmt.Sprintf("http://127.0.0.1:%d%s?%s", port, cp.ContextPath, n))
+		addr := fmt.Sprintf("http://127.0.0.1:%d%s?%s", port, cp.ContextPath, n)
+		_ = open.Run(addr)
 	}
 }
 
