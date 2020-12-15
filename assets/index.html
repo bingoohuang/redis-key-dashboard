@@ -5,10 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Redis Key Dashboard - github.com/hto</title>
+    <title>Redis Key Dashboard</title>
 
-    <link rel="icon" href="/assets/favicon.ico">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="icon" href="{{.contextPath}}/assets/favicon.ico">
+    <link rel="stylesheet" href="{{.contextPath}}/assets/bootstrap-4.0.0.min.css">
     <style>
         html {
             font-size: 14px;
@@ -36,21 +36,19 @@
 
         .box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="{{.contextPath}}/assets/chart-2.8.0.js"></script>
 </head>
 
 <body>
 
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
-        <h5 class="my-0 mr-md-auto font-weight-normal" style="width: 100%; text-align: center">Redis Key Dashboard - github.com/hto</h5>
-        <a class="btn btn-outline-primary" target="_blank" title="redis key monitor document" href="https://github.com/hto/redis-key-dashboard/wiki">Docs</a>
+        <h5 class="my-0 mr-md-auto font-weight-normal" style="width: 100%; text-align: center">Redis Key Dashboard</h5>
     </div>
 
     <div class="pricing-header px-3 py-3 pb-md-4 mx-auto text-center" {{if (ne .status "idle") }} style="display: none;" {{end}}>
         <h1 class="display-5">Hello!</h1>
         <p class="lead">
             This tool allows you to do a small analysis of the amount of keys and memory you use in Redis. It allows you to see overlooked keys and notice overuse.
-            <br /> Please read the <a class="btn-outline-primary" target="_blank" title="redis key monitor" href="https://github.com/hto/redis-key-dashboard/wiki">README.md</a> document before starting.
         </p>
     </div>
 
@@ -117,7 +115,7 @@
             {{if (eq .status "ready") }}
             <div class="card-deck mb-3" style="display: block;">
                 <button type="button" class="btn btn-outline-success" onclick="resetWorker()">New Analysis</button>
-                <a type="button" class="btn btn-info" style="float: right;" href="/api/csv-export" target="_blank">Export All Keys Report to CSV</a>
+                <a type="button" class="btn btn-info" style="float: right;" href="{{.contextPath}}/api/csv-export" target="_blank">Export All Keys Report to CSV</a>
             </div>
             {{end}}
             <div class="card-deck mb-3">
@@ -204,19 +202,16 @@
         <footer class="pt-4 my-md-5 pt-md-5 border-top">
             <div class="row">
                 <div class="col-12 col-md text-center">
-                    Halil Tuğcan Özaktaş -
-                    <span class="mb-3 text-muted">
-                        <a target="_blank" href="https://github.com/hto">github.com/hto</a>
-                    </span>
                 </div>
             </div>
         </footer>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{.contextPath}}/assets/jquery-3.5.1.min.js"></script>
     <script>
+    $(function() {
         {{if or (eq .status "process") (eq .status "ready") }}
-        var ctxB = document.getElementById("barChart").getContext('2d');
+        var ctxB =$("#barChart")[0].getContext('2d');
         var myBarChart = new Chart(ctxB, {
             type: 'bar',
             data: {
@@ -233,58 +228,18 @@
             data: [{{ range .sortedReportListBySize }} {{ .Size|formatMibRaw }}, {{end}}],
             {{end}}
             backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
+                'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)', 'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 159, 64, 0.2)'
             ],
             borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(255, 159, 64, 1)'
+                'rgba(255,99,132,1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)', 'rgba(255,99,132,1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(255,99,132,1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(255,99,132,1)', 'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(255, 159, 64, 1)'
             ],
                 borderWidth: 1
             }]
@@ -301,7 +256,6 @@
         });
         {{end}}
 
-
         var toHHMMSS = (secs) => {
             var secs = secs < 1 ? 1 : secs;
             var sec_num = parseInt(secs, 10)
@@ -316,58 +270,54 @@
         }
 
         {{if (eq .status "ready") }}
-            document.getElementById("timer").innerHTML = toHHMMSS({{ .workerTime }});
+           $("#timer").html(toHHMMSS({{ .workerTime }}))
         {{ end }}
 
         {{if or (eq .status "process") (eq .status "worker") }}
         var timer = parseInt({{ .workerTime }}, 10);
         setInterval(function(){
-            document.getElementById("timer").innerHTML = toHHMMSS(timer);
+            $("#timer").html(toHHMMSS(timer))
             timer++;
         }, 1000);
 
         setInterval(function(){
-            $.post('/api/check-status', function(data, status){
-                console.log(status);
-                console.log(data);
-                console.log(data.status);
+            $.post('{{.contextPath}}/api/check-status', function(data, status){
                 if (data.status == "ready" || data.status == "fail") {
                     location.reload();
                 }
             });
         }, 1000);
         {{end}}
+    });
 
-        {{if or (eq .status "idle") (eq .status "fail") }}
-        function setWorker(){
+    {{if or (eq .status "idle") (eq .status "fail") }}
+    function setWorker(){
+        if ($("#groupkey").val() == 'yes' && $("#delimiters").val().length < 1 ) {
+            alert("If 'Group the keys' is selected yes, you have to enter 'Key Delimiters'. Add ',' after each entered character.\nExample '_,'\nIt allows you to group your keys such as 'user_data, user_config' as user_ *.");
+            return;
+        }
 
-            if ($("#groupkey").val() == 'yes' && $("#delimiters").val().length < 1 ) {
-                alert("If 'Group the keys' is selected yes, you have to enter 'Key Delimiters'. Add ',' after each entered character.\nExample '_,'\nIt allows you to group your keys such as 'user_data, user_config' as user_ *.");
-                return;
-            }
-
-            $.post('/api/worker', {
-                "serveraddress": $("#serveraddress").val(),
-                "password": $("#password").val(),
-                "pattern": $("#pattern").val(),
-                "groupkey": $("#groupkey").val() == 'yes',
-                "memoryusage": $("#memoryusage").val() == 'yes',
-                "delimiters": $("#delimiters").val(),
-            }, function(data, status){
-                location.reload();
-            })
+        $.post('{{.contextPath}}/api/worker', {
+            "serveraddress": $("#serveraddress").val(),
+            "password": $("#password").val(),
+            "pattern": $("#pattern").val(),
+            "groupkey": $("#groupkey").val() == 'yes',
+            "memoryusage": $("#memoryusage").val() == 'yes',
+            "delimiters": $("#delimiters").val(),
+        }, function(data, status){
+            location.reload();
+        })
             .fail(function(xhr, status, error) {
                 alert("Invalid form values");
             });
-        }
-        {{end}}
+    }
+    {{end}}
 
-        function resetWorker(){
-            $.post('/api/reset-worker', function(data, status){
-                location.reload();
-            });
-        }
-
+    function resetWorker(){
+        $.post('{{.contextPath}}/api/reset-worker', function(data, status){
+            location.reload();
+        });
+    }
     </script>
 
   </body>

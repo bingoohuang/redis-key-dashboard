@@ -1,14 +1,22 @@
 # Redis Key Dashboard
 
-> This tool allows you to do a small analysis of the amount of keys and memory you use in Redis. It allows you to see overlooked keys and notice overuse.
+This tool allows you to do a small analysis of the amount of keys and memory you use in Redis. It allows you to see overlooked keys and notice overuse.
 
-> **Please read the [Wiki](https://github.com/hto/redis-key-dashboard/wiki) document before starting.**
+If a new analysis is not started, the final report continues to be shown to you.
 
----
+NOTE: You can see the top 25 keys on the dashboard. You can use the CSV EXPORT option for all.
+
+## Features
+
+1. Basic Auth
+1. Csv export
+1. Web Dashboard
+1. Key Grouping
+1. Memory Usage Report
+1. Chart Analysis
+1. Process Time
 
 ![Demo Gif](docs/demo.gif)
-
----
 
 ## How to work ?
 
@@ -20,14 +28,9 @@
 
 > Compile the code after cloning it into your computer. If you wish, you can protect your dashboard with **BasicAuth**.
 
-```sh
-git clone https://github.com/hto/redis-key-dashboard.git
-```
-
-```sh
-go build
-
-./redis-key-dashboard
+1. `git clone https://github.com/bingoohuang/rediskeydashboard.git`
+1. `make install`
+1. `rediskeydashboard`
 ```
 
 > http://127.0.0.1:8080
@@ -35,10 +38,10 @@ go build
 ## Running Alternatives
 
 ```sh
-./redis-key-dashboard
-./redis-key-dashboard -port=9090
-./redis-key-dashboard -auth=user1:password
-./redis-key-dashboard -auth=user1:password -port=9090
+./rediskeydashboard
+./rediskeydashboard -port=9090
+./rediskeydashboard -auth=user1:password
+./rediskeydashboard -auth=user1:password -port=9090
 ```
 
 ## Example Report

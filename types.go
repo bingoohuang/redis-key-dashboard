@@ -1,4 +1,4 @@
-package types
+package rediskeydashboard
 
 import "time"
 
@@ -12,12 +12,14 @@ const (
 	StatusReady   Status = "ready"
 )
 
-var ScanStatus Status
-var ScanErrMsg string
-var RedisInfo RedisInfoStruct
-var ScanConfReq ScanConfReqStruct
-var SortedReportListByCount SortByCount
-var SortedReportListBySize SortBySize
+var (
+	ScanStatus              Status
+	ScanErrMsg              string
+	RedisInfo               RedisInfoStruct
+	ScanConfReq             ScanConfReqStruct
+	SortedReportListByCount SortByCount
+	SortedReportListBySize  SortBySize
+)
 
 type SortByCount []Report
 

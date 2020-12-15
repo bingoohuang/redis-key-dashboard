@@ -1,7 +1,6 @@
-package worker
+package rediskeydashboard
 
 import (
-	"redis-key-dashboard/pkg/types"
 	"sort"
 	"strings"
 	"time"
@@ -11,16 +10,16 @@ import (
 
 func Scanner() {
 	for {
-		if types.ScanStatus == types.StatusWorker {
+		if ScanStatus == StatusWorker {
 			time.Sleep(time.Duration(1) * time.Second)
 
-			types.ScanStatus = types.StatusProcess
-			types.RedisInfo.StartTime = time.Now()
+			ScanStatus = StatusProcess
+			RedisInfo.StartTime = time.Now()
 
 			scan()
 
-			types.RedisInfo.EndTime = time.Now()
-			types.ScanStatus = types.StatusReady
+			RedisInfo.EndTime = time.Now()
+			ScanStatus = StatusReady
 		}
 		time.Sleep(time.Duration(1) * time.Second)
 	}
@@ -28,8 +27,8 @@ func Scanner() {
 
 func scan() {
 	client := redis.NewClient(&redis.Options{
-		Addr:        types.ScanConfReq.ServerAddress,
-		Password:    types.ScanConfReq.Password,
+		Addr:        ScanConfReq.ServerAddress,
+		Password:    ScanConfReq.Password,
 		DB:          0,
 		ReadTimeout: 1 * time.Minute,
 	})
@@ -41,30 +40,30 @@ func scan() {
 			switch stats[i] {
 			case "total.allocated":
 				if i+1 < len(stats) {
-					types.RedisInfo.TotalMemory = stats[i+1].(int64)
+					RedisInfo.TotalMemory = stats[i+1].(int64)
 				}
 			case "keys.count":
 				if i+1 < len(stats) {
-					types.RedisInfo.TotalKeyCount = stats[i+1].(int64)
+					RedisInfo.TotalKeyCount = stats[i+1].(int64)
 				}
 
 			}
 		}
 	}
 
-	mr := types.KeyReports{}
-	delimiters := strings.Split(types.ScanConfReq.Delimiters, ",")
+	mr := KeyReports{}
+	delimiters := strings.Split(ScanConfReq.Delimiters, ",")
 	cursor := uint64(0)
 	groupKey := ""
 
-	isGroupKey := types.ScanConfReq.GroupKey
-	isMemoryUsage := types.ScanConfReq.MemoryUsage
+	isGroupKey := ScanConfReq.GroupKey
+	isMemoryUsage := ScanConfReq.MemoryUsage
 
 	for {
-		keys, cursor, err := client.Scan(cursor, types.ScanConfReq.Pattern, 1000).Result()
+		keys, cursor, err := client.Scan(cursor, ScanConfReq.Pattern, 1000).Result()
 		if err != nil {
-			types.ScanStatus = types.StatusFail
-			types.ScanErrMsg = "Redis not connect !! => " + types.ScanConfReq.ServerAddress
+			ScanStatus = StatusFail
+			ScanErrMsg = "Redis not connect !! => " + ScanConfReq.ServerAddress
 			break
 		}
 
@@ -79,25 +78,25 @@ func scan() {
 
 	if isMemoryUsage {
 		for _, report := range mr {
-			types.SortedReportListBySize = append(types.SortedReportListBySize, report)
+			SortedReportListBySize = append(SortedReportListBySize, report)
 		}
-		sort.Sort(types.SortedReportListBySize)
+		sort.Sort(SortedReportListBySize)
 	} else {
 		for _, report := range mr {
-			types.SortedReportListByCount = append(types.SortedReportListByCount, report)
+			SortedReportListByCount = append(SortedReportListByCount, report)
 		}
-		sort.Sort(types.SortedReportListByCount)
+		sort.Sort(SortedReportListByCount)
 	}
 }
 
-func scanKey(client *redis.Client, isGroupKey, isMemoryUsage bool, key string, delimiters []string, groupKey string, mr types.KeyReports) {
+func scanKey(client *redis.Client, isGroupKey, isMemoryUsage bool, key string, delimiters []string, groupKey string, mr KeyReports) {
 	var memoryUsage int64
 	if isMemoryUsage {
 		memoryUsage, _ = client.MemoryUsage(key).Result()
 	}
 
 	if !isGroupKey {
-		mr[key] = types.Report{Key: key, Count: 1, Size: memoryUsage}
+		mr[key] = Report{Key: key, Count: 1, Size: memoryUsage}
 		return
 	}
 
@@ -115,11 +114,11 @@ func scanKey(client *redis.Client, isGroupKey, isMemoryUsage bool, key string, d
 		}
 	}
 
-	r := types.Report{}
+	r := Report{}
 	if _, ok := mr[groupKey]; ok {
 		r = mr[groupKey]
 	} else {
-		r = types.Report{Key: groupKey}
+		r = Report{Key: groupKey}
 	}
 
 	r.Size += memoryUsage
