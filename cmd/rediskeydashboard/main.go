@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/bingoohuang/rediskeydashboard"
 	"github.com/gin-gonic/gin"
@@ -28,7 +29,13 @@ func main() {
 	rediskeydashboard.ScanStatus = rediskeydashboard.StatusIdle
 	go rediskeydashboard.Scanner()
 
-	if err := r.Run(fmt.Sprintf(":%d", *serverPort)); err != nil {
+	addr := fmt.Sprintf(":%d", *serverPort)
+	fmt.Fprintf(os.Stdout, "start to listen on %s\n", addr)
+	go func() {
+		cp.OpenExplorer(*serverPort)
+	}()
+
+	if err := r.Run(addr); err != nil {
 		panic(err)
 	}
 }

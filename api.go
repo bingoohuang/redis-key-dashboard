@@ -12,14 +12,17 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/bingoohuang/pkger"
 
+	"github.com/averagesecurityguy/random"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/skratchdot/open-golang/open"
 )
 
 type ContextPath struct {
@@ -49,7 +52,7 @@ func fixContextPath(p string) string {
 		return ""
 	}
 
-	if strings.HasPrefix(p, "/") {
+	if !strings.HasPrefix(p, "/") {
 		p = "/" + p
 	}
 
@@ -58,6 +61,16 @@ func fixContextPath(p string) string {
 	}
 
 	return p
+}
+
+// OpenExplorer ...
+func (cp ContextPath) OpenExplorer(port int) {
+	switch runtime.GOOS {
+	case "windows", "darwin":
+		n, _ := random.AlphaNum(10)
+		addr := fmt.Sprintf("http://127.0.0.1:%d%s?%s", port, cp.ContextPath, n)
+		_ = open.Run(addr)
+	}
 }
 
 func (cp ContextPath) Path(p string) string {
