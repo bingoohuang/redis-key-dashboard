@@ -172,7 +172,8 @@ func BasicAuthCheck(auth string) gin.HandlerFunc {
 			return
 		}
 
-		c.Header("WWW-Authenticate", "Authorization Required")
+		realm := "Authorization Required"
+		c.Header("WWW-Authenticate", "Basic realm="+strconv.Quote(realm))
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}
 }
