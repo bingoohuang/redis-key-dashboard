@@ -27,12 +27,11 @@ import (
 
 type ContextPath struct {
 	ContextPath string
-	AuthFn      gin.HandlerFunc
 	IndexTpl    *template.Template
 }
 
-func MakeContextPath(p string, auth string) ContextPath {
-	authFn := BasicAuthCheck(auth)
+func MakeContextPath(r *gin.Engine, p string, auth string) ContextPath {
+	BasicAuthCheck(r, auth)
 	pkger.Include("/assets")
 
 	indexHtml, err := pkger.Read("/assets/index.html")
@@ -44,7 +43,7 @@ func MakeContextPath(p string, auth string) ContextPath {
 		panic(err)
 	}
 
-	return ContextPath{ContextPath: fixContextPath(p), AuthFn: authFn, IndexTpl: indexTpl}
+	return ContextPath{ContextPath: fixContextPath(p), IndexTpl: indexTpl}
 }
 
 func fixContextPath(p string) string {
@@ -149,7 +148,9 @@ func (cp ContextPath) CheckStatusHandler(c *gin.Context) {
 
 func (cp ContextPath) CsvExportHandler(c *gin.Context) {
 	c.Header("Content-Description", "File Transfer")
-	c.Header("Content-Disposition", "attachment; filename=report:"+ScanConfReq.ServerAddress+".csv")
+	cd := mime.FormatMediaType("attachment", map[string]string{"filename": ScanConfReq.ServerAddress + ".csv"})
+	c.Header("Content-Disposition", cd)
+	c.Header("Content-Type", "application/octet-stream")
 
 	b := &bytes.Buffer{}
 	w := csv.NewWriter(b)
@@ -158,8 +159,7 @@ func (cp ContextPath) CsvExportHandler(c *gin.Context) {
 		log.Fatalln("error writing record to csv:", err)
 	}
 
-	isMemoryUsage := ScanConfReq.MemoryUsage
-	if !isMemoryUsage {
+	if !ScanConfReq.MemoryUsage {
 		for _, d := range SortedReportListByCount {
 			w.Write([]string{d.Key, strconv.FormatInt(d.Count, 10), "-"})
 		}
@@ -173,22 +173,19 @@ func (cp ContextPath) CsvExportHandler(c *gin.Context) {
 	c.Data(http.StatusOK, "text/csv", b.Bytes())
 }
 
-func BasicAuthCheck(auth string) gin.HandlerFunc {
+func BasicAuthCheck(r *gin.Engine, auth string) {
 	if auth == "" {
-		return nil
+		return
 	}
 
 	authHead := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 
-	return func(c *gin.Context) {
-		if authHead == c.GetHeader("Authorization") {
-			return
+	r.Use(func(c *gin.Context) {
+		if authHead != c.GetHeader("Authorization") {
+			c.Header("WWW-Authenticate", "Basic realm=Restricted")
+			c.AbortWithStatus(http.StatusUnauthorized)
 		}
-
-		realm := "Authorization Required"
-		c.Header("WWW-Authenticate", "Basic realm="+strconv.Quote(realm))
-		c.AbortWithStatus(http.StatusUnauthorized)
-	}
+	})
 }
 
 var fnMap = template.FuncMap{

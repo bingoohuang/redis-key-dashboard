@@ -17,7 +17,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	cp := rediskeydashboard.MakeContextPath(*contextPath, *basicAuth)
+	cp := rediskeydashboard.MakeContextPath(r, *contextPath, *basicAuth)
 
 	r.GET(cp.Path("/"), cp.MainHandler)
 	r.GET(cp.Path("/assets/*name"), cp.AssetsHandler)
